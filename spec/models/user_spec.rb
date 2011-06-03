@@ -88,7 +88,7 @@ describe User do
       @user.should respond_to(:encrypted_password)
     end
 
-    it "should set theencrypted password" do
+    it "should set the encrypted password" do
       @user.encrypted_password.should_not be_blank
     end    
 
@@ -118,5 +118,20 @@ describe User do
     
   end  
 
+  describe "admin attribute" do
+    before(:each) do
+      @user = User.create!(@attr)
+    end
+    it "should respond to admin" do
+      @user.should respond_to(:admin)
+    end
+    it "should not be admin by default" do
+      @user.should_not be_admin
+    end    
+    it "should be convertible to an admin" do
+      @user.toggle!(:admin)
+      @user.should be_admin
+    end       
+  end
   
 end
