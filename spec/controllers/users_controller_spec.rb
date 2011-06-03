@@ -37,10 +37,10 @@ describe UsersController do
       end
       it "should paginate users" do
         get :index
-        responsible.should have_selector("div.pagination")
-        responsible.should have_selector("span.disabled", :content => "Previous")
-        responsible.should have_selector("a", :href => "/users?page=2", :content => "2")
-        responsible.should have_selector("a", :href => "/users?page=2", :content => "Next")
+        response.should have_selector("div.pagination")
+        response.should have_selector("span.disabled", :content => "Previous")
+        response.should have_selector("a", :href => "/users?page=2", :content => "2")
+        response.should have_selector("a", :href => "/users?page=2", :content => "Next")
       end
     end        
   end
@@ -137,8 +137,9 @@ describe UsersController do
     end
     it "should have the right title" do
       get :edit, :id => @user
-      response.should have_selector("title", :content => "Edit User")
+      response.should have_selector('title', :content => "Edit user")
     end
+
     it "should have a link to change the Gravatar" do
       get :edit, :id => @user
       gravatar_url = "http://gravatar.com/emails"
