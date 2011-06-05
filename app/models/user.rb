@@ -15,6 +15,15 @@ class User < ActiveRecord::Base
   attr_accessible :name, :email, :password, :password_confirmation
   
   has_many :microposts, :dependent => :destroy
+  has_many :relationships,  :foreign_key => "follower_id",
+                            :dependent => :destroy
+                            
+  has_many :reverse_relationships,  :foreign_key => "followed_id",
+                                    :class_name => "Relationship",
+                                    :dependent => :destroy
+  has_many :followers, :through => :reverse_relationships, :source => :follower                                  
+                            
+  has_many :following, :through => :relationships, :source => :followed                          
     
   email_regex = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
   
@@ -28,6 +37,20 @@ class User < ActiveRecord::Base
                         :length       => {:within => 6..40}
   
   before_save :encrypt_password
+  
+  def self.authenticate_with_salt(id, stored_salt)
+  end
+  
+  def following?(followed)
+    relationships.find_by_followed_id(followed)
+  end
+  
+  def follow!(followed)
+    relationships.create!(:followed_id => followed.id)
+  end
+  def unfollow!(followed)
+    relationships.find_by_followed_id(followed).destroy
+  end
   
   def has_password?(submitted_password)
     encrypted_password == encrypt(submitted_password)
@@ -46,7 +69,7 @@ class User < ActiveRecord::Base
   
   def feed
     # This is preliminary. See Chapter 12 for the full implementation
-    Micropost.where("user_id = ?",id)
+    Micropost.from_users_followed_by(self)
   end
     
   private
